@@ -1,3 +1,7 @@
 # Created by .ignore support plugin (hsz.mobi)
 .idea/
 **/*.iml
+data/**/*
+output/**/*
+app development output.ipynb
+/.ipynb_checkpoints/

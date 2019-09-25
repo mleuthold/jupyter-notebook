@@ -1,0 +1,41 @@
+# https://taskfile.dev
+
+version: '2'
+
+vars:
+  GREETING: Hello, World!
+
+tasks:
+  default:
+    cmds:
+      - echo "{{.GREETING}}"
+    silent: true
+
+  start.notebook:
+    cmds:
+      - jupyter notebook
+    silent: true
+
+  sync.files:
+    cmds:
+      - aws s3 sync s3://deutsche-boerse-xetra-pds data --exclude "*" --include "*2019-09*" --exclude "*$(date +"%Y-%m-%d")*" # --dryrun
+
+  clean.output:
+    cmds:
+      - rm -f output/_SUCCESS
+      - rm -f output/.*.crc
+      - mv -u output/*.csv output/result_set.csv || true
+
+  install.requirements:
+    cmds:
+      - pip3 install --user pipenv
+      - pipenv --python 3
+      - pipenv run pip install -r requirements.txt
+
+  run.notebook:
+    deps: [install.requirements]
+    cmds:
+      - echo $ISIN
+      - pipenv run papermill app\ development.ipynb app\ development\ output.ipynb -p ISIN $ISIN
+    env:
+      ISIN: AT0000A0E9W5
